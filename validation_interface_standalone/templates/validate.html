@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 LLM Transition Validation</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #3730a3;
+            --secondary-color: #10b981;
+            --secondary-hover: #059669;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --neutral-color: #6c757d;
+            
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --animation-fast: 0.15s ease-in-out;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: #ffffff;
+            color: #333333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            background: rgba(255,255,255,0.1);
+            height: 8px;
+            border-radius: var(--border-radius-sm);
+            margin: 1rem auto;
+            overflow: hidden;
+            max-width: 400px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            height: 100%;
+            border-radius: var(--border-radius-sm);
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .context-section {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .context-section h3 {
+            color: #333333;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-label {
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-display {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius-sm);
+            padding: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .action-name {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-params {
+            color: #666666;
+            font-size: 0.9rem;
+        }
+
+        .materials-grid, .observations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .material-item, .observation-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius-sm);
+            padding: 0.75rem;
+            transition: all var(--animation-fast);
+        }
+
+        .material-item:hover, .observation-item:hover {
+            background: #f8f9fa;
+            border-color: var(--primary-color);
+            transform: translateX(4px);
+        }
+
+        .observation-item {
+            border-left: 4px solid var(--info-color);
+        }
+
+        .material-name {
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 0.25rem;
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .property-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 0.4rem 0.6rem;
+            font-size: 0.8rem;
+        }
+
+        .property-key {
+            font-weight: 600;
+            color: #495057;
+            margin-right: 0.25rem;
+        }
+
+        .property-value {
+            color: #666666;
+        }
+
+        .material-type {
+            display: inline-block;
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        .observation-text {
+            font-size: 0.9rem;
+            color: #333333;
+            margin-bottom: 0.5rem;
+        }
+
+        .observation-details {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .observation-details > div {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.75rem;
+        }
+
+        .observation-details > div strong {
+            color: #495057;
+            margin-right: 0.25rem;
+        }
+
+        .prediction-section {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .prediction-section h3 {
+            color: #333333;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .model-info {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .prediction-content {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius-sm);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .reasoning-section {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius-sm);
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .reasoning-text {
+            color: #333333;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .validation-section {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .validation-section h3 {
+            color: #333333;
+            margin-bottom: 1.5rem;
+        }
+
+        .plausibility-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .plausibility-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-weight: 600;
+            font-family: var(--font-family);
+            transition: all var(--animation-fast);
+            min-width: 150px;
+            font-size: 1rem;
+        }
+
+        .plausibility-btn.plausible {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .plausibility-btn.plausible:hover {
+            background: var(--secondary-hover);
+        }
+
+        .plausibility-btn.implausible {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .plausibility-btn.implausible:hover {
+            background: var(--danger-hover);
+        }
+
+        .plausibility-btn.selected {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+            font-weight: 700;
+        }
+
+        .plausibility-btn.selected::before {
+            content: "✓ ";
+            margin-right: 0.25rem;
+            font-size: 1.1rem;
+        }
+
+        .error-categories {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius-sm);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: left;
+            display: none;
+        }
+
+        .error-categories.show {
+            display: block;
+        }
+
+        .error-categories h4 {
+            color: #333333;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .error-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .error-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 0.75rem;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: all var(--animation-fast);
+        }
+
+        .error-item:hover {
+            background: #f8f9fa;
+            border-color: var(--primary-color);
+        }
+
+        .error-item.selected {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .error-item.selected .error-description {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .error-checkbox {
+            margin-right: 0.75rem;
+            margin-top: 0.1rem;
+        }
+
+        .error-content {
+            flex: 1;
+        }
+
+        .error-label {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .error-description {
+            font-size: 0.85rem;
+            color: #666666;
+        }
+
+        .custom-error {
+            margin-top: 1rem;
+        }
+
+        .custom-error textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius-sm);
+            font-family: var(--font-family);
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .comments-section {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius-sm);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .comments-section h4 {
+            color: #333333;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .comments-section textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius-sm);
+            font-family: var(--font-family);
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .submit-section {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius-sm);
+            padding: 1.5rem;
+        }
+
+        .submit-btn {
+            background: var(--success-color);
+            color: white;
+            font-size: 1rem;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 1rem;
+            transition: all var(--animation-fast);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: var(--secondary-hover);
+        }
+
+        .submit-btn:disabled {
+            background: var(--neutral-color);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .skip-btn {
+            background: var(--neutral-color);
+            color: white;
+            font-size: 1rem;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all var(--animation-fast);
+        }
+
+        .skip-btn:hover {
+            background: #5a6268;
+        }
+
+        .confidence-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .confidence-btn {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius-sm);
+            background: white;
+            cursor: pointer;
+            font-family: var(--font-family);
+            transition: all var(--animation-fast);
+            flex: 1;
+            min-width: 120px;
+            font-size: 0.9rem;
+        }
+
+        .confidence-btn:hover {
+            border-color: var(--warning-color);
+            background: #fffbf0;
+        }
+
+        .confidence-btn.selected {
+            background: var(--warning-color);
+            color: white;
+            border-color: var(--warning-color);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+            font-weight: 600;
+        }
+
+        .confidence-btn.selected::before {
+            content: "✓ ";
+            margin-right: 0.25rem;
+        }
+
+        .empty-state {
+            color: #6c757d;
+            font-style: italic;
+            padding: 1rem;
+            text-align: center;
+            background: white;
+            border: 1px dashed #e9ecef;
+            border-radius: var(--border-radius-sm);
+        }
+
+        .comparison-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .initial-state, .predicted-state {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+        }
+
+        .initial-state h3, .predicted-state h3 {
+            color: #333333;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .initial-state {
+            border-left: 4px solid var(--info-color);
+        }
+
+        .predicted-state {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .state-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .state-section:last-child {
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-layout {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .plausibility-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .plausibility-btn {
+                width: 100%;
+                max-width: 200px;
+            }
+            .error-grid {
+                grid-template-columns: 1fr;
+            }
+            .confidence-buttons {
+                flex-direction: column;
+            }
+            .confidence-btn {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <h1><i class="fas fa-microscope"></i> LLM Transition Validation</h1>
+            <p>Validate the plausibility of model predictions and categorize errors</p>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ (progress.completed / progress.total * 100)|round }}%"></div>
+            </div>
+            <div class="progress-text">Progress: {{ progress.completed }} / {{ progress.total }} transitions validated</div>
+        </header>
+        
+        <main class="main-content">
+            <!-- Experimental Context -->
+            <div class="context-section">
+                <h3><i class="fas fa-flask"></i> Experimental Context</h3>
+                
+                <div class="section-item">
+                    <div class="section-label"><i class="fas fa-play-circle"></i> Action</div>
+                    <div class="action-display">
+                        <div class="action-name">{{ transition.action.name }}</div>
+                        <div class="action-params">
+                            {% for key, value in transition.action.parameters.items() %}
+                            <div><strong>{{ key }}:</strong> {{ value }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Materials and Observations Comparison -->
+            <div class="comparison-layout">
+                <!-- Initial State -->
+                <div class="initial-state">
+                    <h3><i class="fas fa-arrow-right"></i> Initial State</h3>
+                    
+                    <div class="state-section">
+                        <div class="section-label"><i class="fas fa-vials"></i> Input Materials</div>
+                        <div class="prediction-content">
+                            <div class="materials-grid">
+                                {% if transition.input_materials %}
+                                    {% for material in transition.input_materials %}
+                                    <div class="material-item">
+                                        <div class="material-name">{{ material.name }}</div>
+                                        <div class="properties-grid">
+                                            {% for key, value in material.properties.items() %}
+                                            <div class="property-item">
+                                                <span class="property-key">{{ key }}:</span>
+                                                <span class="property-value">{{ value }}</span>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% if material.material_type %}
+                                        <div class="material-type">{{ material.material_type|upper }}</div>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="empty-state">No input materials</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="state-section">
+                        <div class="section-label"><i class="fas fa-eye"></i> Input Observations</div>
+                        <div class="prediction-content">
+                            <div class="observations-list">
+                                {% if transition.input_observations %}
+                                    {% for obs in transition.input_observations %}
+                                    <div class="observation-item">
+                                        <div class="observation-text">{{ obs.description }}</div>
+                                        <div class="observation-details">
+                                            <div><strong>Type:</strong> {{ obs.measurement_type or 'N/A' }}</div>
+                                            <div><strong>Value:</strong> {{ obs.value or 'N/A' }}</div>
+                                            {% if obs.timestamp %}
+                                            <div><strong>Time:</strong> {{ obs.timestamp }}</div>
+                                            {% endif %}
+                                            {% if obs.barcode %}
+                                            <div><strong>ID:</strong> {{ obs.barcode }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="empty-state">No input observations</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Predicted State -->
+                <div class="predicted-state">
+                    <h3>
+                        <i class="fas fa-robot"></i> Model Prediction
+                        <span class="model-info">BLINDED</span>
+                    </h3>
+                    
+                    <div class="state-section">
+                        <div class="section-label"><i class="fas fa-flask"></i> Predicted New Materials</div>
+                        <div class="prediction-content">
+                            {% if transition.prediction.prediction.new_materials %}
+                            <div class="materials-grid">
+                                {% for material in transition.prediction.prediction.new_materials %}
+                                <div class="material-item">
+                                    <div class="material-name">{{ material.name }}</div>
+                                    <div class="properties-grid">
+                                        {% for key, value in material.properties.items() %}
+                                        <div class="property-item">
+                                            <span class="property-key">{{ key }}:</span>
+                                            <span class="property-value">{{ value }}</span>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% if material.material_type %}
+                                    <div class="material-type">{{ material.material_type|upper }}</div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="empty-state">No new materials predicted</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="state-section">
+                        <div class="section-label"><i class="fas fa-eye"></i> Predicted New Observations</div>
+                        <div class="prediction-content">
+                            {% if transition.prediction.prediction.new_observations %}
+                            <div class="observations-list">
+                                {% for obs in transition.prediction.prediction.new_observations %}
+                                <div class="observation-item">
+                                    <div class="observation-text">{{ obs.description }}</div>
+                                    <div class="observation-details">
+                                        <div><strong>Type:</strong> {{ obs.measurement_type or 'N/A' }}</div>
+                                        <div><strong>Value:</strong> {{ obs.value or 'N/A' }}</div>
+                                        {% if obs.timestamp %}
+                                        <div><strong>Time:</strong> {{ obs.timestamp }}</div>
+                                        {% endif %}
+                                        {% if obs.barcode %}
+                                        <div><strong>ID:</strong> {{ obs.barcode }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="empty-state">No new observations predicted</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if transition.prediction.prediction.reasoning %}
+                    <div class="state-section">
+                        <div class="section-label"><i class="fas fa-brain"></i> Model Reasoning</div>
+                        <div class="prediction-content">
+                            <div class="reasoning-text">{{ transition.prediction.prediction.reasoning | truncate_at_secret }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Validation Section -->
+            <div class="validation-section">
+                <h3><i class="fas fa-check-circle"></i> Validate This Prediction</h3>
+                
+                <div class="plausibility-buttons">
+                    <button class="plausibility-btn plausible" onclick="setPlausibility(true)">
+                        <i class="fas fa-thumbs-up"></i> Plausible
+                    </button>
+                    <button class="plausibility-btn implausible" onclick="setPlausibility(false)">
+                        <i class="fas fa-thumbs-down"></i> Implausible
+                    </button>
+                </div>
+
+                <!-- Error Categories (shown when implausible) -->
+                <div class="error-categories" id="error-categories">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Select Error Categories:</h4>
+                    <div class="error-grid">
+                        {% for category in error_categories %}
+                        <div class="error-item" onclick="toggleErrorCategory('{{ category.id }}')">
+                            <input type="checkbox" class="error-checkbox" id="error-{{ category.id }}" readonly>
+                            <div class="error-content">
+                                <div class="error-label">{{ category.label }}</div>
+                                <div class="error-description">{{ category.description }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="custom-error">
+                        <label for="custom-error-text"><strong>Other (please describe):</strong></label>
+                        <textarea id="custom-error-text" placeholder="Describe any other errors not covered by the categories above..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Comments -->
+                <div class="comments-section">
+                    <h4><i class="fas fa-comment"></i> Additional Comments (Optional)</h4>
+                    <textarea id="comments" placeholder="Any additional observations or notes about this prediction..."></textarea>
+                </div>
+
+                <!-- Confidence Rating -->
+                <div class="comments-section">
+                    <h4><i class="fas fa-star"></i> Confidence in Your Assessment</h4>
+                    <div class="confidence-buttons">
+                        <button class="confidence-btn" data-confidence="1" onclick="setConfidence(1)">
+                            <i class="fas fa-star"></i> 1 - Very Low
+                        </button>
+                        <button class="confidence-btn" data-confidence="2" onclick="setConfidence(2)">
+                            <i class="fas fa-star"></i> 2 - Low
+                        </button>
+                        <button class="confidence-btn" data-confidence="3" onclick="setConfidence(3)">
+                            <i class="fas fa-star"></i> 3 - Medium
+                        </button>
+                        <button class="confidence-btn" data-confidence="4" onclick="setConfidence(4)">
+                            <i class="fas fa-star"></i> 4 - High
+                        </button>
+                        <button class="confidence-btn" data-confidence="5" onclick="setConfidence(5)">
+                            <i class="fas fa-star"></i> 5 - Very High
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="submit-section">
+                    <button id="submit-btn" class="submit-btn" onclick="submitValidation()" disabled>
+                        <i class="fas fa-check"></i> Submit Validation & Next
+                    </button>
+                    <button class="skip-btn" onclick="skipTransition()">
+                        <i class="fas fa-forward"></i> Skip
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        const transitionData = {{ transition | tojson }};
+        let isSubmitting = false;
+        let isPlausible = null;
+        let selectedErrors = new Set();
+        let confidence = null;
+        
+        function setPlausibility(plausible) {
+            isPlausible = plausible;
+            
+            // Update button states
+            document.querySelectorAll('.plausibility-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            const selectedBtn = document.querySelector(`.plausibility-btn.${plausible ? 'plausible' : 'implausible'}`);
+            selectedBtn.classList.add('selected');
+            
+            // Show/hide error categories
+            const errorSection = document.getElementById('error-categories');
+            if (plausible) {
+                errorSection.classList.remove('show');
+                selectedErrors.clear();
+                // Clear all error selections
+                document.querySelectorAll('.error-item').forEach(item => {
+                    item.classList.remove('selected');
+                    item.querySelector('input').checked = false;
+                });
+                document.getElementById('custom-error-text').value = '';
+            } else {
+                errorSection.classList.add('show');
+            }
+            
+            checkCanSubmit();
+        }
+        
+        function toggleErrorCategory(categoryId) {
+            const errorItem = document.querySelector(`[onclick="toggleErrorCategory('${categoryId}')"]`);
+            const checkbox = document.getElementById(`error-${categoryId}`);
+            
+            if (selectedErrors.has(categoryId)) {
+                selectedErrors.delete(categoryId);
+                errorItem.classList.remove('selected');
+                checkbox.checked = false;
+            } else {
+                selectedErrors.add(categoryId);
+                errorItem.classList.add('selected');
+                checkbox.checked = true;
+            }
+        }
+        
+        function setConfidence(rating) {
+            confidence = rating;
+            
+            // Update button states
+            document.querySelectorAll('.confidence-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            const selectedBtn = document.querySelector(`[data-confidence="${rating}"]`);
+            selectedBtn.classList.add('selected');
+            
+            checkCanSubmit();
+        }
+        
+        function checkCanSubmit() {
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = isPlausible === null || confidence === null;
+        }
+        
+        function submitValidation() {
+            if (isSubmitting || isPlausible === null || confidence === null) return;
+            isSubmitting = true;
+            
+            const errorCategories = Array.from(selectedErrors);
+            const customError = document.getElementById('custom-error-text').value;
+            const comments = document.getElementById('comments').value;
+            
+            fetch('/validate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    transition_id: transitionData.transition_id,
+                    is_plausible: isPlausible,
+                    error_categories: errorCategories,
+                    custom_error: customError,
+                    comments: comments,
+                    confidence: confidence,
+                    transition_data: transitionData
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.reload();
+                } else {
+                    alert('Error saving validation');
+                    isSubmitting = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error saving validation');
+                isSubmitting = false;
+            });
+        }
+        
+        function skipTransition() {
+            if (isSubmitting) return;
+            isSubmitting = true;
+            
+            fetch('/skip', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    transition_id: transitionData.transition_id
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.reload();
+                } else {
+                    alert('Error skipping');
+                    isSubmitting = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error skipping');
+                isSubmitting = false;
+            });
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (isSubmitting) return;
+            
+            // P for plausible, I for implausible
+            if (e.key === 'p' || e.key === 'P') {
+                setPlausibility(true);
+            } else if (e.key === 'i' || e.key === 'I') {
+                setPlausibility(false);
+            }
+            
+            // Numbers 1-5 for confidence
+            if (['1', '2', '3', '4', '5'].includes(e.key)) {
+                setConfidence(parseInt(e.key));
+            }
+            
+            // Enter to submit
+            if (e.key === 'Enter' && !document.getElementById('submit-btn').disabled) {
+                submitValidation();
+            }
+            
+            // Escape to skip
+            if (e.key === 'Escape') {
+                skipTransition();
+            }
+        });
+    </script>
+</body>
+</html>

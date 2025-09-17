@@ -1,0 +1,1061 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧬 LLM Transition Model Comparison</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #3730a3;
+            --secondary-color: #10b981;
+            --secondary-hover: #059669;
+            --accent-color: #f59e0b;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            
+            --dark-bg: #0f172a;
+            --dark-surface: #1e293b;
+            --dark-surface-hover: #334155;
+            --dark-border: #475569;
+            --dark-text: #f1f5f9;
+            --dark-text-secondary: #94a3b8;
+            --dark-text-muted: #64748b;
+            
+            --glass-bg: rgba(30, 41, 59, 0.8);
+            --glass-border: rgba(148, 163, 184, 0.2);
+            --glass-shadow: rgba(0, 0, 0, 0.3);
+            
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --mono-font: 'Fira Code', 'Monaco', 'Cascadia Code', monospace;
+            
+            --border-radius: 12px;
+            --border-radius-lg: 16px;
+            --border-radius-sm: 8px;
+            
+            --animation-fast: 0.15s ease-in-out;
+            --animation-medium: 0.3s ease-in-out;
+            --animation-slow: 0.5s ease-in-out;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: #ffffff;
+            color: #333333;
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-bottom: none;
+            padding: 1.5rem 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            background: rgba(255,255,255,0.1);
+            height: 8px;
+            border-radius: var(--border-radius-sm);
+            margin: 1rem auto;
+            overflow: hidden;
+            max-width: 400px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            height: 100%;
+            border-radius: var(--border-radius-sm);
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .context-section {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .context-section h3 {
+            color: #333333;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-label {
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-display {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius-sm);
+            padding: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .action-name {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-params {
+            color: #666666;
+            font-size: 0.9rem;
+        }
+
+        .materials-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .material-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius-sm);
+            padding: 0.75rem;
+            transition: all var(--animation-fast);
+        }
+
+        .material-item:hover {
+            background: #f8f9fa;
+            border-color: var(--primary-color);
+            transform: translateX(4px);
+        }
+
+        .material-name {
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 0.25rem;
+        }
+
+        .material-properties {
+            font-size: 0.85rem;
+            color: #666666;
+            margin-bottom: 0.25rem;
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .property-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 0.4rem 0.6rem;
+            font-size: 0.8rem;
+        }
+
+        .property-key {
+            font-weight: 600;
+            color: #495057;
+            margin-right: 0.25rem;
+        }
+
+        .property-value {
+            color: #666666;
+        }
+
+        .observation-details {
+            margin-top: 0.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .observation-details > div {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.75rem;
+        }
+
+        .observation-details > div strong {
+            color: #495057;
+            margin-right: 0.25rem;
+        }
+
+        .material-type {
+            display: inline-block;
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .material-type.static {
+            background: #6c757d;
+        }
+
+        .observations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .observation-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius-sm);
+            padding: 0.75rem;
+            border-left: 4px solid var(--info-color);
+        }
+
+        .observation-text {
+            font-size: 0.9rem;
+            color: #333333;
+            margin-bottom: 0.25rem;
+        }
+
+        .observation-meta {
+            font-size: 0.8rem;
+            color: #666666;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .prediction {
+            background: #fafafa;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            transition: all var(--animation-fast);
+        }
+
+        .prediction:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .prediction h3 {
+            color: #333333;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .model-label {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .model-label.model-b {
+            background: var(--secondary-color);
+        }
+
+        .prediction-content {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius-sm);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .prediction-section {
+            margin-bottom: 1rem;
+        }
+
+        .prediction-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .prediction-section h4 {
+            color: #333333;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .execution-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .rating-section {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .rating-section h3 {
+            color: #333333;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-with-rating {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-with-rating h3 {
+            color: #333333;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .rating-subsection {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius-sm);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .rating-subsection h4 {
+            color: #333333;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .rating-submit-section {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius-sm);
+            padding: 1.5rem;
+        }
+
+        .submit-btn {
+            background: var(--success-color);
+            color: white;
+            font-size: 1rem;
+            padding: 1rem 2rem;
+            margin: 1rem 0.5rem 0 0;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: #059669;
+        }
+
+        .submit-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .rating-btn.selected {
+            background: var(--primary-color) !important;
+            color: white !important;
+            border: 3px solid var(--primary-color) !important;
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.5);
+            font-weight: 700;
+            position: relative;
+        }
+
+        .rating-btn.selected.secondary {
+            background: var(--secondary-color) !important;
+            border-color: var(--secondary-color) !important;
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
+        }
+
+        .rating-btn.selected.warning {
+            background: var(--warning-color) !important;
+            border-color: var(--warning-color) !important;
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.5);
+        }
+
+        .rating-btn.selected.danger {
+            background: var(--danger-color) !important;
+            border-color: var(--danger-color) !important;
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.5);
+        }
+
+        .rating-btn.selected.neutral {
+            background: #6c757d !important;
+            border-color: #6c757d !important;
+            box-shadow: 0 6px 16px rgba(108, 117, 125, 0.5);
+        }
+
+        .rating-btn.selected::before {
+            content: "✓ ";
+            font-weight: bold;
+            margin-right: 0.25rem;
+            font-size: 1.1rem;
+        }
+
+        .rating-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .rating-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-weight: 600;
+            font-family: var(--font-family);
+            transition: all var(--animation-fast);
+            min-width: 120px;
+        }
+
+        .rating-btn.primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .rating-btn.primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .rating-btn.secondary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .rating-btn.secondary:hover {
+            background: var(--secondary-hover);
+        }
+
+        .rating-btn.warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .rating-btn.warning:hover {
+            background: #d97706;
+        }
+
+        .rating-btn.danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .rating-btn.danger:hover {
+            background: var(--danger-hover);
+        }
+
+        .rating-btn.neutral {
+            background: var(--dark-text-muted);
+            color: white;
+        }
+
+        .rating-btn.neutral:hover {
+            background: var(--dark-text-secondary);
+        }
+
+        .comments {
+            margin-top: 1rem;
+        }
+
+        .comments textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius-sm);
+            color: #333333;
+            font-family: var(--font-family);
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .comments textarea::placeholder {
+            color: #6c757d;
+        }
+
+        .empty-state {
+            color: #6c757d;
+            font-style: italic;
+            padding: 1rem;
+            text-align: center;
+            background: white;
+            border: 1px dashed #e9ecef;
+            border-radius: var(--border-radius-sm);
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .rating-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .rating-btn {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <h1><i class="fas fa-flask"></i> LLM Transition Model Comparison</h1>
+            <p>Rate which model better predicts experimental transitions</p>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ (progress.completed / progress.total * 100)|round }}%"></div>
+            </div>
+            <div class="progress-text">Progress: {{ progress.completed }} / {{ progress.total }} comparisons completed</div>
+        </header>
+        
+        <main class="main-content">
+            <div class="context-section">
+                <h3><i class="fas fa-microscope"></i> Experimental Context</h3>
+                
+                <div class="section-item">
+                    <div class="section-label"><i class="fas fa-play-circle"></i> Action</div>
+                    <div class="action-display">
+                        <div class="action-name">{{ pair.comparison.action.name }}</div>
+                        <div class="action-params">
+                            {% for key, value in pair.comparison.action.parameters.items() %}
+                            <div><strong>{{ key }}:</strong> {{ value }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-item">
+                    <div class="section-label"><i class="fas fa-vials"></i> Input Materials</div>
+                    <div class="materials-grid">
+                        {% if pair.comparison.input_materials %}
+                            {% for material in pair.comparison.input_materials %}
+                            <div class="material-item">
+                                <div class="material-name">{{ material.name }}</div>
+                                <div class="properties-grid">
+                                    {% for key, value in material.properties.items() %}
+                                    <div class="property-item">
+                                        <span class="property-key">{{ key }}:</span>
+                                        <span class="property-value">{{ value }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% if material.material_type %}
+                                <div class="material-type {{ material.material_type|lower }}">{{ material.material_type|upper }}</div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state">No input materials</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="section-item">
+                    <div class="section-label"><i class="fas fa-eye"></i> Input Observations</div>
+                    <div class="observations-list">
+                        {% if pair.comparison.input_observations %}
+                            {% for obs in pair.comparison.input_observations %}
+                            <div class="observation-item">
+                                <div class="observation-text">{{ obs.description }}</div>
+                                <div class="observation-details">
+                                    <div><strong>Type:</strong> {{ obs.measurement_type or 'N/A' }}</div>
+                                    <div><strong>Value:</strong> {{ obs.value or 'N/A' }}</div>
+                                    {% if obs.timestamp %}
+                                    <div><strong>Time:</strong> {{ obs.timestamp }}</div>
+                                    {% endif %}
+                                    {% if obs.barcode %}
+                                    <div><strong>ID:</strong> {{ obs.barcode }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state">No input observations</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Materials Comparison Section -->
+            <div class="section-with-rating">
+                <h3><i class="fas fa-flask"></i> Materials Predictions</h3>
+                <div class="comparison-grid">
+                    <div class="prediction">
+                        <h3>
+                            <i class="fas fa-robot"></i> Model A
+                            <span class="model-label">BLINDED</span>
+                        </h3>
+                        <div class="prediction-content">
+                            {% if pair.prediction_a.prediction.new_materials %}
+                            <div class="materials-grid">
+                                {% for material in pair.prediction_a.prediction.new_materials %}
+                                <div class="material-item">
+                                    <div class="material-name">{{ material.name }}</div>
+                                    <div class="properties-grid">
+                                        {% for key, value in material.properties.items() %}
+                                        <div class="property-item">
+                                            <span class="property-key">{{ key }}:</span>
+                                            <span class="property-value">{{ value }}</span>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% if material.material_type %}
+                                    <div class="material-type {{ material.material_type|lower }}">{{ material.material_type|upper }}</div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="empty-state">No new materials predicted</div>
+                            {% endif %}
+                        </div>
+                        <div class="execution-info">
+                            <span>Success: {{ pair.prediction_a.prediction.success|default('Unknown') }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="prediction">
+                        <h3>
+                            <i class="fas fa-robot"></i> Model B
+                            <span class="model-label model-b">BLINDED</span>
+                        </h3>
+                        <div class="prediction-content">
+                            {% if pair.prediction_b.prediction.new_materials %}
+                            <div class="materials-grid">
+                                {% for material in pair.prediction_b.prediction.new_materials %}
+                                <div class="material-item">
+                                    <div class="material-name">{{ material.name }}</div>
+                                    <div class="properties-grid">
+                                        {% for key, value in material.properties.items() %}
+                                        <div class="property-item">
+                                            <span class="property-key">{{ key }}:</span>
+                                            <span class="property-value">{{ value }}</span>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% if material.material_type %}
+                                    <div class="material-type {{ material.material_type|lower }}">{{ material.material_type|upper }}</div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="empty-state">No new materials predicted</div>
+                            {% endif %}
+                        </div>
+                        <div class="execution-info">
+                            <span>Success: {{ pair.prediction_b.prediction.success|default('Unknown') }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Materials Rating -->
+                <div class="rating-subsection">
+                    <h4><i class="fas fa-flask"></i> Rate Materials Prediction</h4>
+                    <div class="rating-buttons" id="materials-rating">
+                        <button class="rating-btn primary" onclick="setRating('materials', 'a_better')">
+                            <i class="fas fa-arrow-left"></i> A is Better
+                        </button>
+                        <button class="rating-btn secondary" onclick="setRating('materials', 'b_better')">
+                            <i class="fas fa-arrow-right"></i> B is Better
+                        </button>
+                        <button class="rating-btn warning" onclick="setRating('materials', 'tie')">
+                            <i class="fas fa-equals"></i> It's a Tie
+                        </button>
+                        <button class="rating-btn danger" onclick="setRating('materials', 'both_bad')">
+                            <i class="fas fa-times"></i> Both Poor
+                        </button>
+                        <button class="rating-btn neutral" onclick="setRating('materials', 'skip')">
+                            <i class="fas fa-forward"></i> Skip
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Observations Comparison Section -->
+            <div class="section-with-rating">
+                <h3><i class="fas fa-eye"></i> Observations Predictions</h3>
+                <div class="comparison-grid">
+                    <div class="prediction">
+                        <h3>
+                            <i class="fas fa-robot"></i> Model A
+                            <span class="model-label">BLINDED</span>
+                        </h3>
+                        <div class="prediction-content">
+                            {% if pair.prediction_a.prediction.new_observations %}
+                            <div class="observations-list">
+                                {% for obs in pair.prediction_a.prediction.new_observations %}
+                                <div class="observation-item">
+                                    <div class="observation-text">{{ obs.description }}</div>
+                                    <div class="observation-details">
+                                        <div><strong>Type:</strong> {{ obs.measurement_type or 'N/A' }}</div>
+                                        <div><strong>Value:</strong> {{ obs.value or 'N/A' }}</div>
+                                        {% if obs.timestamp %}
+                                        <div><strong>Time:</strong> {{ obs.timestamp }}</div>
+                                        {% endif %}
+                                        {% if obs.barcode %}
+                                        <div><strong>ID:</strong> {{ obs.barcode }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="empty-state">No new observations predicted</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="prediction">
+                        <h3>
+                            <i class="fas fa-robot"></i> Model B
+                            <span class="model-label model-b">BLINDED</span>
+                        </h3>
+                        <div class="prediction-content">
+                            {% if pair.prediction_b.prediction.new_observations %}
+                            <div class="observations-list">
+                                {% for obs in pair.prediction_b.prediction.new_observations %}
+                                <div class="observation-item">
+                                    <div class="observation-text">{{ obs.description }}</div>
+                                    <div class="observation-details">
+                                        <div><strong>Type:</strong> {{ obs.measurement_type or 'N/A' }}</div>
+                                        <div><strong>Value:</strong> {{ obs.value or 'N/A' }}</div>
+                                        {% if obs.timestamp %}
+                                        <div><strong>Time:</strong> {{ obs.timestamp }}</div>
+                                        {% endif %}
+                                        {% if obs.barcode %}
+                                        <div><strong>ID:</strong> {{ obs.barcode }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="empty-state">No new observations predicted</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Observations Rating -->
+                <div class="rating-subsection">
+                    <h4><i class="fas fa-eye"></i> Rate Observations Prediction</h4>
+                    <div class="rating-buttons" id="observations-rating">
+                        <button class="rating-btn primary" onclick="setRating('observations', 'a_better')">
+                            <i class="fas fa-arrow-left"></i> A is Better
+                        </button>
+                        <button class="rating-btn secondary" onclick="setRating('observations', 'b_better')">
+                            <i class="fas fa-arrow-right"></i> B is Better
+                        </button>
+                        <button class="rating-btn warning" onclick="setRating('observations', 'tie')">
+                            <i class="fas fa-equals"></i> It's a Tie
+                        </button>
+                        <button class="rating-btn danger" onclick="setRating('observations', 'both_bad')">
+                            <i class="fas fa-times"></i> Both Poor
+                        </button>
+                        <button class="rating-btn neutral" onclick="setRating('observations', 'skip')">
+                            <i class="fas fa-forward"></i> Skip
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reasoning Comparison (if available) -->
+            {% if pair.prediction_a.prediction.reasoning or pair.prediction_b.prediction.reasoning %}
+            <div class="section-with-rating">
+                <h3><i class="fas fa-brain"></i> Model Reasoning</h3>
+                <div class="comparison-grid">
+                    <div class="prediction">
+                        <h3>
+                            <i class="fas fa-robot"></i> Model A
+                            <span class="model-label">BLINDED</span>
+                        </h3>
+                        <div class="prediction-content">
+                            {% if pair.prediction_a.prediction.reasoning %}
+                            <div class="observation-text">{{ pair.prediction_a.prediction.reasoning }}</div>
+                            {% else %}
+                            <div class="empty-state">No reasoning provided</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="prediction">
+                        <h3>
+                            <i class="fas fa-robot"></i> Model B
+                            <span class="model-label model-b">BLINDED</span>
+                        </h3>
+                        <div class="prediction-content">
+                            {% if pair.prediction_b.prediction.reasoning %}
+                            <div class="observation-text">{{ pair.prediction_b.prediction.reasoning }}</div>
+                            {% else %}
+                            <div class="empty-state">No reasoning provided</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Final Submit Section -->
+            <div class="rating-section">
+                <h3><i class="fas fa-check-circle"></i> Submit Your Ratings</h3>
+                <div class="rating-submit-section">
+                    <div class="comments">
+                        <textarea id="comments" placeholder="Optional comments about this comparison..."></textarea>
+                    </div>
+                    <button id="submit-ratings-btn" class="rating-btn submit-btn" onclick="submitRatings()" disabled>
+                        <i class="fas fa-check"></i> Submit Ratings & Next
+                    </button>
+                    <button class="rating-btn neutral" onclick="skipAll()">
+                        <i class="fas fa-fast-forward"></i> Skip Entire Comparison
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        const pairData = {{ pair | tojson }};
+        let isSubmitting = false;
+        let ratings = {
+            materials: null,
+            observations: null
+        };
+        
+        function setRating(category, rating, buttonElement = null) {
+            // Clear previous selection
+            const buttons = document.querySelectorAll(`#${category}-rating .rating-btn`);
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            
+            // Set new selection
+            let clickedButton;
+            if (buttonElement) {
+                clickedButton = buttonElement;
+            } else {
+                clickedButton = event.target.closest('.rating-btn');
+            }
+            
+            if (clickedButton) {
+                clickedButton.classList.add('selected');
+            }
+            
+            ratings[category] = rating;
+            checkCanSubmit();
+        }
+        
+        function checkCanSubmit() {
+            const submitBtn = document.getElementById('submit-ratings-btn');
+            const hasRatings = ratings.materials && ratings.observations;
+            submitBtn.disabled = !hasRatings;
+        }
+        
+        function submitRatings() {
+            if (isSubmitting || !ratings.materials || !ratings.observations) return;
+            isSubmitting = true;
+            
+            const comments = document.getElementById('comments').value;
+            
+            fetch('/rate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    pair_id: pairData.pair_id,
+                    materials_rating: ratings.materials,
+                    observations_rating: ratings.observations,
+                    comments: comments,
+                    prediction_a: pairData.prediction_a,
+                    prediction_b: pairData.prediction_b,
+                    swapped: pairData.swapped || false
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.reload();
+                } else {
+                    alert('Error saving ratings');
+                    isSubmitting = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error saving ratings');
+                isSubmitting = false;
+            });
+        }
+        
+        function skipAll() {
+            if (isSubmitting) return;
+            isSubmitting = true;
+            
+            fetch('/skip', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    pair_id: pairData.pair_id
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.reload();
+                } else {
+                    alert('Error skipping');
+                    isSubmitting = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error skipping');
+                isSubmitting = false;
+            });
+        }
+        
+        let keyMode = null; // 'materials' or 'observations' or null
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (isSubmitting) return;
+            
+            // Check for mode selection first
+            if (e.key === 'm' || e.key === 'M') {
+                keyMode = 'materials';
+                console.log('Materials mode activated - press 1-5 to rate');
+                return;
+            }
+            
+            if (e.key === 'o' || e.key === 'O') {
+                keyMode = 'observations';
+                console.log('Observations mode activated - press 1-5 to rate');
+                return;
+            }
+            
+            // Handle number keys based on current mode
+            if (keyMode && ['1', '2', '3', '4', '5'].includes(e.key)) {
+                let rating;
+                switch(e.key) {
+                    case '1':
+                        rating = 'a_better';
+                        break;
+                    case '2':
+                        rating = 'b_better';
+                        break;
+                    case '3':
+                        rating = 'tie';
+                        break;
+                    case '4':
+                        rating = 'both_bad';
+                        break;
+                    case '5':
+                        rating = 'skip';
+                        break;
+                }
+                
+                // Find the correct button element
+                const buttonElement = document.querySelector(`#${keyMode}-rating .rating-btn:nth-child(${e.key})`);
+                setRating(keyMode, rating, buttonElement);
+                
+                keyMode = null; // Reset mode after rating
+                return;
+            }
+            
+            // Submit ratings
+            if (e.key === 'Enter' && !document.getElementById('submit-ratings-btn').disabled) {
+                submitRatings();
+            }
+            
+            // Skip all
+            if (e.key === 'Escape') {
+                skipAll();
+            }
+        });
+    </script>
+</body>
+</html>
+    
